@@ -1,14 +1,14 @@
 <template>
-  <v-card>
-    <v-card-title>
-      <v-btn color="primary" @click="addBrand">新增品牌</v-btn>
-      <!--搜索框，与search属性关联-->
-      <v-spacer/>
+  <div>
+    <v-layout row class="pb-2 px-2">
       <v-flex xs3>
-      <v-text-field label="输入关键字搜索" v-model.lazy="search" append-icon="search" hide-details/>
+        <v-btn color="success">新增品牌</v-btn>
       </v-flex>
-    </v-card-title>
-    <v-divider/>
+      <v-spacer/>
+      <v-flex xs5>
+        <v-text-field label="品牌搜索" append-icon="search" hide-details="true" v-model="name"/>
+      </v-flex>
+    </v-layout>
     <v-data-table
       :headers="headers"
       :items="brands"
@@ -20,132 +20,100 @@
       <template slot="items" slot-scope="props">
         <td class="text-xs-center">{{ props.item.id }}</td>
         <td class="text-xs-center">{{ props.item.name }}</td>
-        <td class="text-xs-center">
-          <img v-if="props.item.image" :src="props.item.image" width="130" height="40">
-          <span v-else>无</span>
-        </td>
+        <td class="text-xs-center"><img :src="props.item.image" alt=""></td>
         <td class="text-xs-center">{{ props.item.letter }}</td>
-        <td class="justify-center layout px-0">
-          <v-btn icon @click="editBrand(props.item)">
-            <i class="el-icon-edit"/>
+        <td class="text-xs-center">
+          <v-btn flat icon color="info">
+            <v-icon>edit</v-icon>
           </v-btn>
-          <v-btn icon @click="deleteBrand(props.item)">
-            <i class="el-icon-delete"/>
+          <v-btn flat icon color="red">
+            <v-icon>delete</v-icon>
           </v-btn>
         </td>
       </template>
     </v-data-table>
-    <!--弹出的对话框-->
-    <v-dialog max-width="500" v-model="show" persistent scrollable>
-      <v-card>
-        <!--对话框的标题-->
-        <v-toolbar dense dark color="primary">
-          <v-toolbar-title>{{isEdit ? '修改' : '新增'}}品牌</v-toolbar-title>
-          <v-spacer/>
-          <!--关闭窗口的按钮-->
-          <v-btn icon @click="closeWindow"><v-icon>close</v-icon></v-btn>
-        </v-toolbar>
-        <!--对话框的内容，表单-->
-        <v-card-text class="px-5" style="height:400px">
-          <brand-form @close="closeWindow" :oldBrand="oldBrand" :isEdit="isEdit"/>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </v-card>
+  </div>
 </template>
 
 <script>
-  // 导入自定义的表单组件
-  import BrandForm from './BrandForm'
-
   export default {
-    name: "brand",
+    name: "Brand",
     data() {
       return {
-        search: '', // 搜索过滤字段
-        totalBrands: 0, // 总条数
-        brands: [], // 当前页品牌数据
-        loading: true, // 是否在加载中
-        pagination: {}, // 分页信息
         headers: [
-          {text: 'id', align: 'center', value: 'id'},
-          {text: '名称', align: 'center', sortable: false, value: 'name'},
-          {text: 'LOGO', align: 'center', sortable: false, value: 'image'},
-          {text: '首字母', align: 'center', value: 'letter', sortable: true,},
-          {text: '操作', align: 'center', value: 'id', sortable: false}
+          {text: 'Brand Id', align: 'center', sortable: true, value: 'id',},
+          {text: '品牌名称', align: 'center', sortable: false, value: 'name',},
+          {text: '品牌LOGO', align: 'center', sortable: false, value: 'image',},
+          {text: '品牌首字母', align: 'center', sortable: true, value: 'letter',},
+          {text: '操作', align: 'center',},
         ],
-        show: false,// 控制对话框的显示
-        oldBrand: {}, // 即将被编辑的品牌数据
-        isEdit: false, // 是否是编辑
+        brands: [],
+        pagination: {},
+        totalBrands: 0,
+        loading: false,
+        name: '',
       }
     },
-    mounted() { // 渲染后执行
-      // 查询数据
-      this.getDataFromServer();
-    },
-    watch: {
-      pagination: { // 监视pagination属性的变化
-        deep: true, // deep为true，会监视pagination的属性及属性中的对象属性变化
-        handler() {
-          // 变化后的回调函数，这里我们再次调用getDataFromServer即可
-          this.getDataFromServer();
+    created() {
+      this.brands = [
+        {
+          "id": 2032,
+          "name": "OPPO",
+          "image": "http://img10.360buyimg.com/popshop/jfs/t2119/133/2264148064/4303/b8ab3755/56b2f385N8e4eb051.jpg",
+          "letter": "O"
+        },
+        {
+          "id": 2033,
+          "name": "飞利浦（PHILIPS）",
+          "image": "http://img12.360buyimg.com/popshop/jfs/t18361/122/1318410299/1870/36fe70c9/5ac43a4dNa44a0ce0.jpg",
+          "letter": "F"
+        },
+        {
+          "id": 2034,
+          "name": "华为（HUAWEI）",
+          "image": "http://img10.360buyimg.com/popshop/jfs/t5662/36/8888655583/7806/1c629c01/598033b4Nd6055897.jpg",
+          "letter": "H"
+        },
+        {
+          "id": 2036,
+          "name": "酷派（Coolpad）",
+          "image": "http://img10.360buyimg.com/popshop/jfs/t2521/347/883897149/3732/91c917ec/5670cf96Ncffa2ae6.jpg",
+          "letter": "K"
+        },
+        {
+          "id": 2037,
+          "name": "魅族（MEIZU）",
+          "image": "http://img13.360buyimg.com/popshop/jfs/t3511/131/31887105/4943/48f83fa9/57fdf4b8N6e95624d.jpg",
+          "letter": "M"
         }
-      },
-      search: { // 监视搜索字段
-        handler() {
-          this.getDataFromServer();
-        }
-      }
+      ]
+      this.totalBrands = 50
     },
     methods: {
-      getDataFromServer() { // 从服务的加载数的方法。
-        // 发起请求
-        this.$http.get("/item/brand/page", {
+      loadBrands() {
+        this.$http.get('/brand/list', {
           params: {
-            key: this.search, // 搜索条件
-            page: this.pagination.page,// 当前页
-            rows: this.pagination.rowsPerPage,// 每页大小
-            sortBy: this.pagination.sortBy,// 排序字段
-            desc: this.pagination.descending// 是否降序
+            name: this.name,
+            desc: this.pagination.descending,
+            page: this.pagination.page,
+            rowsPerPage: this.pagination.rowsPerPage,
+            sortBy: this.pagination.sortBy,
           }
-        }).then(resp => { // 这里使用箭头函数
-          this.brands = resp.data.items;
-          this.totalBrands = resp.data.total;
-          // 完成赋值后，把加载状态赋值为false
-          this.loading = false;
         })
-      },
-      addBrand() {
-        // 修改标记
-        this.isEdit = false;
-        // 控制弹窗可见：
-        this.show = true;
-        // 把oldBrand变为null
-        this.oldBrand = null;
-      },
-      editBrand(oldBrand){
-        // 根据品牌信息查询商品分类
-        this.$http.get("/item/category/bid/" + oldBrand.id)
-          .then(({data}) => {
-            // 修改标记
-            this.isEdit = true;
-            // 控制弹窗可见：
-            this.show = true;
-            // 获取要编辑的brand
-            this.oldBrand = oldBrand
-            // 回显商品分类
-            this.oldBrand.categories = data;
-          })
-      },
-      closeWindow(){
-        // 重新加载数据
-        this.getDataFromServer();
-        // 关闭窗口
-        this.show = false;
       }
     },
-    components:{
-        BrandForm
+    watch: {
+      name: {
+        handler() {
+          this.loadBrands()
+        }
+      },
+      pagination: {
+        deep: true,
+        handler() {
+          this.loadBrands()
+        }
+      }
     }
   }
 </script>
