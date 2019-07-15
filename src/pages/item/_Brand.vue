@@ -56,7 +56,7 @@
 
 <script>
   // 导入自定义的表单组件
-  import BrandForm from './BrandForm'
+  import BrandForm from './_BrandForm'
 
   export default {
     name: "brand",

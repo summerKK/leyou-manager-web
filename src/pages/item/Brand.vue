@@ -2,7 +2,7 @@
   <div>
     <v-layout row class="pb-2 px-2">
       <v-flex xs3>
-        <v-btn color="success">新增品牌</v-btn>
+        <v-btn color="success" @click="addBrand">新增品牌</v-btn>
       </v-flex>
       <v-spacer/>
       <v-flex xs5>
@@ -32,12 +32,33 @@
         </td>
       </template>
     </v-data-table>
+    <!--对话框-->
+    <v-dialog max-width="600" persistent v-model="show">
+      <v-card>
+        <!--对话框的标题-->
+        <v-toolbar dense dark color="primary">
+          <v-toolbar-title>新增品牌</v-toolbar-title>
+          <v-spacer/>
+          <v-btn icon @click="closeWindow">
+            <v-icon>close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <!--对话框的内容，表单-->
+        <v-card-text class="px-5">
+          <brand-form/>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
+
+  import BrandForm from "./BrandForm";
+
   export default {
     name: "Brand",
+    components: {BrandForm},
     data() {
       return {
         headers: [
@@ -52,6 +73,8 @@
         totalBrands: 0,
         loading: false,
         name: '',
+        // 控制对话框是否显示
+        show: false,
       }
     },
     created() {
@@ -60,6 +83,7 @@
 
     methods: {
       loadBrands() {
+        this.loading = true
         this.$http.get('/item/brand/list', {
           params: {
             name: this.name,
@@ -74,6 +98,12 @@
           // 完成赋值后，把加载状态赋值为false
           this.loading = false
         })
+      },
+      addBrand() {
+        this.show = true
+      },
+      closeWindow() {
+        this.show = false
       }
     },
 
