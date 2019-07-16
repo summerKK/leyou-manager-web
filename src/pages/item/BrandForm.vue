@@ -15,7 +15,7 @@
       <v-flex>
         <v-upload
           v-model="brand.image"
-          url="/item/upload"
+          url="/upload/image"
           :multiple="false"
           :pic-width="250"
           :pic-height="90"
@@ -65,6 +65,7 @@
           params.letter = letter.toUpperCase()
           this.$http.post('/item/brand', this.$qs.stringify(params))
             .then(() => {
+              this.$emit('close')
               this.$message.success("保存成功")
             })
             .catch(() => {

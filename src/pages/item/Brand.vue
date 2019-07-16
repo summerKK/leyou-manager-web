@@ -45,7 +45,7 @@
         </v-toolbar>
         <!--对话框的内容，表单-->
         <v-card-text class="px-5">
-          <brand-form/>
+          <brand-form @close="closeWindow"/>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -104,6 +104,7 @@
       },
       closeWindow() {
         this.show = false
+        this.loadBrands()
       }
     },
 
