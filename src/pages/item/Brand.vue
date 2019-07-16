@@ -23,10 +23,10 @@
         <td class="text-xs-center"><img :src="props.item.image" alt=""></td>
         <td class="text-xs-center">{{ props.item.letter }}</td>
         <td class="text-xs-center">
-          <v-btn flat icon color="info">
+          <v-btn flat icon color="info" @click="editBrand(props.item)">
             <v-icon>edit</v-icon>
           </v-btn>
-          <v-btn flat icon color="red">
+          <v-btn flat icon color="red" @click="deleteBrand(props.item.id)">
             <v-icon>delete</v-icon>
           </v-btn>
         </td>
@@ -37,7 +37,7 @@
       <v-card>
         <!--对话框的标题-->
         <v-toolbar dense dark color="primary">
-          <v-toolbar-title>新增品牌</v-toolbar-title>
+          <v-toolbar-title>{{ isEdit ? '修改' : '新增' }}品牌</v-toolbar-title>
           <v-spacer/>
           <v-btn icon @click="closeWindow">
             <v-icon>close</v-icon>
@@ -45,7 +45,7 @@
         </v-toolbar>
         <!--对话框的内容，表单-->
         <v-card-text class="px-5">
-          <brand-form @close="closeWindow"/>
+          <brand-form @close="closeWindow" :oldBrand="oldBrand" :isEdit="isEdit"/>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -75,6 +75,10 @@
         name: '',
         // 控制对话框是否显示
         show: false,
+        // 即将被编辑的品牌数据
+        oldBrand: {},
+        // 是否是编辑
+        isEdit: false,
       }
     },
     created() {
@@ -100,11 +104,41 @@
         })
       },
       addBrand() {
+        this.isEdit = false
+        this.oldBrand = {}
         this.show = true
       },
       closeWindow() {
         this.show = false
         this.loadBrands()
+      },
+      editBrand(oldBrand) {
+        // 根据品牌信息查询商品分类
+        this.$http.get('/item/category/bid/' + oldBrand.id)
+          .then(({data}) => {
+            this.isEdit = true
+            this.show = true
+            this.oldBrand = oldBrand
+            this.oldBrand.categories = data
+          })
+      },
+      deleteBrand(bid) {
+        this.$message.confirm("是否删除?")
+          .then(() => {
+            const params = {id: bid}
+            this.$http({
+              method: 'delete',
+              url: '/item/brand',
+              params: params,
+            })
+              .then(() => {
+                this.$message.success('删除成功')
+                this.loadBrands()
+              })
+              .catch(() => {
+                this.$message.error('删除失败')
+              })
+          })
       }
     },
 

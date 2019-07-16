@@ -33,6 +33,15 @@
 <script>
   export default {
     name: "BrandForm",
+    props: {
+      oldBrand: {
+        type: Object,
+      },
+      isEdit: {
+        type: Boolean,
+        default: false,
+      }
+    },
     data() {
       return {
         // 表单效验结果标识
@@ -63,12 +72,17 @@
           // 分类id
           params.cids = categories.map(c => c.id).join(',')
           params.letter = letter.toUpperCase()
-          this.$http.post('/item/brand', this.$qs.stringify(params))
+          this.$http({
+            method: this.isEdit ? 'put' : 'post',
+            url: '/item/brand',
+            data: this.$qs.stringify(params),
+          })
             .then(() => {
               this.$emit('close')
               this.$message.success("保存成功")
             })
-            .catch(() => {
+            .catch((e) => {
+              console.log(e)
               this.$message.error("保存失败")
             })
         }
@@ -78,6 +92,26 @@
         this.$refs.brandForm.reset()
       }
     },
+
+    watch: {
+      oldBrand: {
+        handler(val) {
+          if (val) {
+            // 注意不要直接复制，否则这边的修改会影响到父组件的数据，copy属性即可
+            this.brand = Object.deepCopy(val)
+          } else {
+            // 为空，初始化brand
+            this.brand = {
+              name: '',
+              letter: '',
+              image: '',
+              categories: [],
+            }
+          }
+        },
+        deep: true
+      }
+    }
 
   }
 </script>
