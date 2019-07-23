@@ -132,7 +132,7 @@
     methods: {
       getDataFromServer() { // 从服务的加载数的方法。
         // 发起请求
-        this.$http.get("/item/spu/page", {
+        this.$http.get("/item/spu/list", {
           params: {
             key: this.filter.search, // 搜索条件
             saleable: this.filter.saleable === 0 ? null : this.filter.saleable, // 上下架
@@ -174,13 +174,13 @@
         // 将步骤调整到1
         this.step = 1;
       },
-      previous(){
-        if(this.step > 1){
+      previous() {
+        if (this.step > 1) {
           this.step--
         }
       },
-      next(){
-        if(this.step < 4 && this.$refs.goodsForm.$refs.basic.validate()){
+      next() {
+        if (this.step < 4 && this.$refs.goodsForm.$refs.basic.validate()) {
           this.step++
         }
       }
